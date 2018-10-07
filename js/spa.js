@@ -2177,10 +2177,9 @@
       subcorpusURL = Symbol.keyFor(vM.subcorpusPane),
       resultsURL = Symbol.keyFor(vM.resultsPane),
       resultsOptionsURL = Symbol.keyFor(vM.resultsOptionsPane);
-
   page.base('/bumppo-ghpages');
   page('/', function () {
-    vM.activePane(vM.queryPane);
+    vM.activePane(vM.subcorpusPane);
   });
   page("/".concat(queryURL), function () {
     vM.activePane(vM.queryPane);
@@ -2194,7 +2193,9 @@
   page("/".concat(resultsOptionsURL), function () {
     vM.activePane(vM.resultsOptionsPane);
   });
-  page();
+  page({
+    hashbang: true
+  });
   $('.ui.checkbox').checkbox();
   videoPlayer.ready(function () {
     var volume = videoPlayer.volume();
