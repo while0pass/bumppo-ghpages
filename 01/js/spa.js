@@ -2177,7 +2177,7 @@
       subcorpusURL = Symbol.keyFor(vM.subcorpusPane),
       resultsURL = Symbol.keyFor(vM.resultsPane),
       resultsOptionsURL = Symbol.keyFor(vM.resultsOptionsPane);
-  page.base('/bumppo-ghpages');
+  page.base('/bumppo-ghpages/01');
   page('/', function () {
     vM.activePane(vM.subcorpusPane);
   });
