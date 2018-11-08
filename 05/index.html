@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Поиск по мультиканальному корпусу</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css">
+    <link href="https://vjs.zencdn.net/7.3.0/video-js.css" rel="stylesheet">
+  </head>
+  <body>
+
+<div class="bmpp-uiLayout">
+  <div class="bmpp-sidePane">
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="click: switchOnSubcorpusPane,
+                 css: { 'bmpp-sidePane_menuItem--current': isSubcorpusPaneOn }">
+      Область поиска
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="click: switchOnQueryPane,
+                 css: { 'bmpp-sidePane_menuItem--current': isQueryPaneOn }">
+      Запрос
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical disabled segment">
+      Настройки выдачи
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="css: { disabled: !canSearch() }, click: search">
+      Искать
+      <i class="ui search icon"></i>
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="click: switchOnResultsPane,
+                 css: { 'bmpp-sidePane_menuItem--current': isResultsPaneOn,
+                         disabled: !canViewResults() }">
+      Результаты
+    </div>
+  </div>
+
+  <div class="bmpp-main" style="position: relative">
+
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;"
+      data-bind="visible: isSearchInProgress" class="ui loading basic segment">
+    </div>
+
+    <!-- ko if: isQueryPaneOn -->
+    <query-pane params="queryTree: queryTree"></query-pane>
+    <!-- /ko -->
+
+    <div class="bmpp-subcorpusPane" data-bind="visible: isSubcorpusPaneOn">
+      <subcorpus-pane params="records: subcorpus.records,
+        recordPhases: subcorpus.recordPhases"></subcorpus-pane>
+    </div>
+
+    <div data-bind="visible: isResultsPaneOn"
+      style="width: 55em; margin: 3em auto auto 6em !important">
+      <header class="ui header">JSON запроса</header>
+      <code><pre data-bind="text: queryJSON"></pre></code>
+    </div>
+
+    <div class="bmpp-resultsPane" style="display: none">
+      <div class="bmpp-resultsPane_video">
+        <video id="bmpp-videoPlayer" class="video-js"
+          preload="auto" height="354"
+          controls data-setup='{
+            "techOrder": ["youtube"],
+            "sources": [{
+              "type": "video/youtube",
+              "src": "https://www.youtube.com/embed/9qPtGm9vcok"
+            }]
+          }'>
+        </video>
+        <!--
+        <div class="bmpp-videoChoices">
+          <div>N-eyf</div>
+          <div>N-vi</div>
+          <div>N-ey</div>
+          <div>C-vi</div>
+          <div>R-vi</div>
+          <div>R-ey</div>
+          <div>W-vi</div>
+        </div>
+        -->
+      </div>
+      <div class="bmpp-resultsPane_results ui basic segment">
+      <!-- ko foreach: results -->
+        <p data-bind="click: $parent.playVideo.bind($data)"
+          class="ui vertical segment" style="cursor: pointer">
+          <i class="disabled film icon"></i>
+          <span style="color: green" data-bind="text: edu"></span>
+          <span data-bind="text: transcription"></span>
+        </p>
+      <!-- /ko -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+    <script src="semantic/semantic.min.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"
+      crossorigin="anonymous"></script>
+    <script src="https://vjs.zencdn.net/7.3.0/video.js"></script>
+    <script src="js/libs/videojs-youtube.min.js"></script>
+    <script src="js/libs/svg.min.js"></script>
+    <script src="js/libs/jquery.initialize.min.js"></script>
+    <script src="js/spa.js"></script>
+  </body>
+</html>
