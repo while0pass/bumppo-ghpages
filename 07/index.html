@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Поиск по мультиканальному корпусу</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css">
+    <link href="https://vjs.zencdn.net/7.3.0/video-js.css" rel="stylesheet">
+  </head>
+  <body style="position: relative">
+
+<style>
+#safetyCurtain{
+  background-color: #fff;
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  z-index: 10000;
+}
+#safetyCurtain:after {
+  position: absolute;
+  content: '';
+  top: 33.3%;
+  left: 50%;
+  margin: -1.5em 0 0 -1.5em;
+  width: 3em;
+  height: 3em;
+  -webkit-animation: segment-spin .6s linear;
+  animation: segment-spin .6s linear;
+  animation-name: segment-spin;
+  animation-duration: .8s;
+  animation-timing-function: linear;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-fill-mode: none;
+  animation-play-state: running;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  border-radius: 500rem;
+  border-color: #767676 rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.1);
+  border-style: solid;
+  border-width: .2em;
+  -webkit-box-shadow: 0 0 0 1px transparent;
+  box-shadow: 0 0 0 1px transparent;
+  visibility: visible;
+  z-index: 10001;
+}
+</style>
+<div id="safetyCurtain"></div>
+
+<div class="bmpp-uiLayout">
+  <div class="bmpp-sidePane">
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="click: switchOnSubcorpusPane,
+                 css: { 'bmpp-sidePane_menuItem--current': isSubcorpusPaneOn }">
+      Область поиска
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="click: switchOnQueryPane,
+                 css: { 'bmpp-sidePane_menuItem--current': isQueryPaneOn }">
+      Запрос
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical disabled segment">
+      Настройки выдачи
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="css: { disabled: !canSearch() }, click: search">
+      Искать
+      <i class="ui search icon"></i>
+    </div>
+    <div class="bmpp-sidePane_menuItem ui vertical segment"
+      data-bind="click: function () {
+                          if (canViewResults()) switchOnResultsPane();
+                        },
+                 css: { 'bmpp-sidePane_menuItem--current': isResultsPaneOn,
+                         disabled: !canViewResults() }">
+      Результаты
+    </div>
+  </div>
+
+  <div class="bmpp-main" style="position: relative">
+
+    <div class="bmpp-mainWait" data-bind="visible: isSearchInProgress">
+      <div class="ui loading basic segment"></div>
+    </div>
+
+    <!-- ko if: isQueryPaneOn -->
+      <!-- ko if: queryPaneView.isTreeVisible -->
+        <query-pane params="queryTree: queryTree"></query-pane>
+      <!-- /ko -->
+      <!-- ko if: queryPaneView.arePropertiesVisible -->
+      <div class="bmpp-propertiesPane">
+        <div class="bmpp-propertiesPaneProps"><div class="bmpp-paddedPane">
+            <properties-pane params="node: queryPaneView.propertiesNode"
+              ></properties-pane>
+        </div></div>
+        <div class="bmpp-propertiesPaneDivider"></div>
+        <div class="bmpp-propertiesPaneButtons">
+            <button class="ui small button"
+              data-bind="click: queryPaneView.finishEditingNodeProperties"
+              >ОК</button>
+            <button class="ui small button">Очистить</button>
+            <button class="ui small button"
+              data-bind="click: queryPaneView.finishEditingNodeProperties"
+              >Отмена</button>
+        </div>
+      </div>
+      <!-- /ko -->
+    <!-- /ko -->
+
+    <div class="bmpp-paddedPane" data-bind="visible: isSubcorpusPaneOn">
+      <subcorpus-pane params="records: subcorpus.records,
+        recordPhases: subcorpus.recordPhases"></subcorpus-pane>
+    </div>
+
+
+    <div class="bmpp-resultsPane" data-bind="visible: isResultsPaneOn">
+      <div class="bmpp-resultsPane_video">
+        <video id="bmpp-videoPlayer" class="video-js"
+          preload="auto" height="192"
+          controls data-setup='{
+            "techOrder": ["youtube"],
+            "sources": [{
+              "type": "video/youtube",
+              "src": "https://www.youtube.com/embed/9qPtGm9vcok"
+            }]
+          }'>
+        </video>
+        <!--
+        <div class="bmpp-videoChoices">
+          <div>N-eyf</div>
+          <div>N-vi</div>
+          <div>N-ey</div>
+          <div>C-vi</div>
+          <div>R-vi</div>
+          <div>R-ey</div>
+          <div>W-vi</div>
+        </div>
+        -->
+      </div>
+      <div class="bmpp-resultsPane_results">
+        <div style="padding: 1em; color: white; background-color: #a00;"
+             data-bind="visible: resultsError">
+          <code><pre data-bind="text: resultsError"></pre></code>
+        </div>
+        <div class="ui basic segment">
+          <!-- ko foreach: results().results -->
+          <p data-bind="click: $parent.playVideo.bind($data)"
+            class="ui vertical segment" style="cursor: pointer">
+            <i class="disabled film icon"></i>
+            <span style="color: green" data-bind="text: left_context"></span>
+            <span data-bind="text: value"></span>
+            <em data-bind="text: right_context" style="color: grey"></em>
+          </p>
+          <!-- /ko -->
+        </div>
+        <div style="padding: 1em; background-color: #eee">
+          <header class="ui header">JSON ответа</header>
+          <code><pre data-bind="text: responseJSON"></pre></code>
+        </div>
+        <div style="padding: 1em">
+          <header class="ui header">JSON запроса</header>
+          <code><pre data-bind="text: queryJSON"></pre></code>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+    <script src="semantic/semantic.min.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"
+      crossorigin="anonymous"></script>
+    <script src="https://vjs.zencdn.net/7.3.0/video.js"></script>
+    <script src="js/libs/videojs-youtube.min.js"></script>
+    <script src="js/libs/svg.min.js"></script>
+    <script src="js/libs/jquery.initialize.min.js"></script>
+    <script src="js/spa.js"></script>
+  </body>
+</html>
